@@ -7,7 +7,7 @@ import { Heading, Panel } from '@/features/market/ui';
 import { pageHead } from '@/features/market/metadata';
 
 export const Route = createFileRoute('/reset-password')({
-  head: () => pageHead('Reset Password', 'Choose a new password for your QuantEdge research account.'),
+  head: () => pageHead('Reset Password', 'Choose a new password for your TradingMurpphhhh research account.'),
   component: ResetPassword,
 });
 
@@ -30,5 +30,5 @@ function ResetPassword() {
     }
     setBusy(false);
   };
-  return <div className="max-w-lg mx-auto py-12"><Heading title="Choose a new password" description="Use at least eight characters for your QuantEdge account." /><Panel title="Account recovery" action={<KeyRound />}><form className="panel-body flex flex-col gap-4" onSubmit={submit}><label className="field">New password<input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /></label><label className="field">Confirm new password<input type="password" autoComplete="new-password" minLength={8} required value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /></label>{message && <div role="status" className="notice">{message}</div>}<Button type="submit" disabled={busy}>{busy ? 'Updating…' : 'Update password'}</Button></form></Panel><p className="mt-4 text-xs text-muted-foreground">Open the latest recovery link from your email before submitting this form.</p></div>;
+  return <div className="max-w-lg mx-auto py-12"><Heading title="Choose a new password" description="Use at least eight characters for your TradingMurpphhhh account." /><Panel title="Account recovery" action={<KeyRound />}><form className="panel-body flex flex-col gap-4" onSubmit={submit}><label className="field">New password<input type="password" autoComplete="new-password" minLength={8} required value={password} onChange={(event) => setPassword(event.target.value)} /></label><label className="field">Confirm new password<input type="password" autoComplete="new-password" minLength={8} required value={confirmation} onChange={(event) => setConfirmation(event.target.value)} /></label>{message && <div role="status" className="notice">{message}</div>}<Button type="submit" disabled={busy}>{busy ? 'Updating…' : 'Update password'}</Button></form></Panel><p className="mt-4 text-xs text-muted-foreground">Open the latest recovery link from your email before submitting this form.</p></div>;
 }

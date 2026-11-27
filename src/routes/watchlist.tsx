@@ -9,7 +9,7 @@ import { pageHead } from '@/features/market/metadata';
 import { useResearch } from '@/features/collections/research-context';
 
 export const Route = createFileRoute('/watchlist')({
-  head: () => pageHead('Watchlist', 'Track sample prices, quantitative signals, momentum, RSI, and moving averages for your saved QuantEdge watchlist.'),
+  head: () => pageHead('Watchlist', 'Track sample prices, quantitative signals, momentum, RSI, and moving averages for your saved TradingMurpphhhh watchlist.'),
   component: Watchlist,
 });
 
