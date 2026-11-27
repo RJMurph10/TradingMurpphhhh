@@ -1,4 +1,4 @@
-import { sampleHistory, type PricePoint } from './sample-data';
+import { sampleHistory, stocks, type PricePoint } from './sample-data';
 export const mean = (a:number[]) => a.length ? a.reduce((s,n)=>s+n,0)/a.length : 0;
 export function indicators(history:PricePoint[]) {
  const prices=history.map(p=>p.price); const last=prices.at(-1) ?? 0;
