@@ -83,9 +83,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "QuantEdge | Quantitative Research" },
+      { title: "TradingMurpphhhh | Quantitative Research" },
       { name: "description", content: "Quantitative market research and paper portfolio analytics." },
-      { property: "og:title", content: "QuantEdge | Quantitative Research" },
+      { property: "og:title", content: "TradingMurpphhhh | Quantitative Research" },
       { property: "og:description", content: "Quantitative market research and paper portfolio analytics." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

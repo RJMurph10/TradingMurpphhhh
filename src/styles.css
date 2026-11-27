@@ -42,8 +42,8 @@
 }
 .terminal-shell { min-height: 100vh; }
 .sidebar { width: 224px; position: fixed; inset: 0 auto 0 0; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 40; }
-.brand { height: 76px; padding: 24px; display: flex; align-items: center; gap: 10px; font-size: 23px; font-weight: 600; }
-.brand-mark { color: var(--primary); width: 29px; height: 29px; }
+.brand { height: 76px; padding: 24px; display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 600; white-space: nowrap; }
+.brand-mark { color: var(--primary); width: 26px; height: 26px; flex-shrink: 0; }
 .brand-edge { color: var(--primary); }
 .nav-label { font-size: 10px; font-weight: 500; letter-spacing: 1.5px; color: var(--muted-foreground); padding: 24px 24px 10px; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 15px; margin: 3px 12px; border-radius: 5px; color: var(--muted-foreground); font-size: 13px; border: 1px solid transparent; transition: background .15s; }
