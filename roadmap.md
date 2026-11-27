@@ -6,4 +6,4 @@
 - [ ] Trading signal filters and explanations.
 - [ ] Watchlist and hypothetical portfolio management with Cloud saving.
 - [ ] Authentication, integrity tests and desktop/mobile verification.
-- [ ] Real market data connection — blocked on provider selection and access.
+- [ ] Polygon.io market data connection — provider selected; connection approval was declined, so live data remains blocked.

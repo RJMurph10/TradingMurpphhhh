@@ -29,6 +29,23 @@ export function composite(results:ModelResult[],weights:number[]) {
  const score=active.reduce((s,{r,w})=>s+r.direction*w,0)/total;
  return {direction:score>.2?'Bullish':score<-.2?'Bearish':'Neutral',expected:active.reduce((s,{r,w})=>s+(r.expected ?? 0)*w,0)/total};
 }
+export type Opportunity = ReturnType<typeof rankOpportunities>[number];
+export function rankOpportunities(universe=sampleUniverse()) {
+ const benchmark=sampleHistory('SPY');
+ const benchmarkMomentum=(benchmark.at(-1)!.price/benchmark.at(-21)!.price-1)*100;
+ return universe.map(stock=>{
+  const h=sampleHistory(stock.ticker);const x=indicators(h);const last=h.at(-1)!;
+  const momentum=(last.price/h.at(-21)!.price-1)*100;
+  const relativeStrength=momentum-benchmarkMomentum;
+  const averageVolume=mean(h.slice(-21,-1).map(p=>p.volume));
+  const volumeAnomaly=averageVolume?(last.volume/averageVolume-1)*100:0;
+  const trendPoints=(x.last>x.ma20?5:-5)+(x.last>x.ma50?5:-5);
+  const score=Math.max(0,Math.min(100,Math.round(50+Math.max(-20,Math.min(20,momentum*2))+Math.max(-15,Math.min(15,relativeStrength))+Math.max(-10,Math.min(10,volumeAnomaly/5))+trendPoints-Math.max(0,Math.min(10,(x.volatility-25)/5)))));
+  const explanation=`${momentum>=0?'Positive':'Negative'} 20-session momentum of ${momentum.toFixed(1)}%, ${relativeStrength>=0?'outperforming':'underperforming'} the sample SPY proxy by ${Math.abs(relativeStrength).toFixed(1)} points. Volume is ${Math.abs(volumeAnomaly).toFixed(0)}% ${volumeAnomaly>=0?'above':'below'} its 20-session average; price is ${x.last>x.ma20?'above':'below'} the 20-session average.`;
+  return {...stock,momentum,relativeStrength,volumeAnomaly,volatility:x.volatility,score,explanation};
+ }).sort((a,b)=>b.score-a.score);
+}
+function sampleUniverse(){return stocks.filter(s=>s.sector!=='ETF');}
 export type BacktestOptions={ticker:string;strategy:string;capital:number;allocation:number;cost:number;slippage:number;fast:number;slow:number;start:string;end:string};
 export function backtest(o:BacktestOptions) {
  if(o.capital<=0 || o.allocation<=0 || o.allocation>100 || o.fast>=o.slow || o.start>=o.end) throw new Error('Check capital, position sizing, dates, and moving-average periods.');

@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BacktestingRouteImport } from './routes/backtesting'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PredictionsRouteImport } from './routes/predictions'
+import { Route as ResearchRouteImport } from './routes/research'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignalsRouteImport } from './routes/signals'
+import { Route as WatchlistRouteImport } from './routes/watchlist'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BacktestingRoute = BacktestingRouteImport.update({
+  id: '/backtesting',
+  path: '/backtesting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PredictionsRoute = PredictionsRouteImport.update({
+  id: '/predictions',
+  path: '/predictions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResearchRoute = ResearchRouteImport.update({
+  id: '/research',
+  path: '/research',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignalsRoute = SignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatchlistRoute = WatchlistRouteImport.update({
+  id: '/watchlist',
+  path: '/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/backtesting': typeof BacktestingRoute
+  '/portfolio': typeof PortfolioRoute
+  '/predictions': typeof PredictionsRoute
+  '/research': typeof ResearchRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signals': typeof SignalsRoute
+  '/watchlist': typeof WatchlistRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/backtesting': typeof BacktestingRoute
+  '/portfolio': typeof PortfolioRoute
+  '/predictions': typeof PredictionsRoute
+  '/research': typeof ResearchRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signals': typeof SignalsRoute
+  '/watchlist': typeof WatchlistRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/backtesting': typeof BacktestingRoute
+  '/portfolio': typeof PortfolioRoute
+  '/predictions': typeof PredictionsRoute
+  '/research': typeof ResearchRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/signals': typeof SignalsRoute
+  '/watchlist': typeof WatchlistRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/backtesting'
+    | '/portfolio'
+    | '/predictions'
+    | '/research'
+    | '/reset-password'
+    | '/signals'
+    | '/watchlist'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/backtesting'
+    | '/portfolio'
+    | '/predictions'
+    | '/research'
+    | '/reset-password'
+    | '/signals'
+    | '/watchlist'
+  id:
+    | '__root__'
+    | '/'
+    | '/backtesting'
+    | '/portfolio'
+    | '/predictions'
+    | '/research'
+    | '/reset-password'
+    | '/signals'
+    | '/watchlist'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BacktestingRoute: typeof BacktestingRoute
+  PortfolioRoute: typeof PortfolioRoute
+  PredictionsRoute: typeof PredictionsRoute
+  ResearchRoute: typeof ResearchRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  SignalsRoute: typeof SignalsRoute
+  WatchlistRoute: typeof WatchlistRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/backtesting': {
+      id: '/backtesting'
+      path: '/backtesting'
+      fullPath: '/backtesting'
+      preLoaderRoute: typeof BacktestingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/predictions': {
+      id: '/predictions'
+      path: '/predictions'
+      fullPath: '/predictions'
+      preLoaderRoute: typeof PredictionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/research': {
+      id: '/research'
+      path: '/research'
+      fullPath: '/research'
+      preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signals': {
+      id: '/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof SignalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watchlist': {
+      id: '/watchlist'
+      path: '/watchlist'
+      fullPath: '/watchlist'
+      preLoaderRoute: typeof WatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BacktestingRoute: BacktestingRoute,
+  PortfolioRoute: PortfolioRoute,
+  PredictionsRoute: PredictionsRoute,
+  ResearchRoute: ResearchRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  SignalsRoute: SignalsRoute,
+  WatchlistRoute: WatchlistRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
