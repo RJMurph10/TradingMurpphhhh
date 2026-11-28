@@ -2,10 +2,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { AlpacaError, dailyBars, intradayBars, latestNews, latestTrades, type NewsItem } from "./alpaca.server";
-import { closesToPoints, summarize, type PricePoint } from "./quotes";
+import { closesToPoints, summarize, type DailyBar, type PricePoint } from "./quotes";
 import { scoreStock, type Scored } from "./quant";
-import { marketSession, type Session } from "./session";
-import { BENCHMARK, isTicker } from "./universe";
+import { etDate, marketSession, type Session } from "./session";
+import { BENCHMARK, isTicker, STOCKS } from "./universe";
+import {
+  boardRow,
+  dayFacts,
+  explain,
+  gradePick,
+  leanOf,
+  signalBook,
+  strengthOf,
+  type Board,
+  type PickResult,
+} from "./edges";
 
 export type Live<T> =
   | { ok: true; data: T; session: Session; asOf: string }
@@ -81,3 +92,72 @@ export const getIntraday = createServerFn({ method: "GET" })
 export const getNews = createServerFn({ method: "GET" })
   .inputValidator((data: unknown) => z.object({ symbols: symbolList.optional() }).parse(data ?? {}))
   .handler(({ data }) => live<NewsItem[]>(() => latestNews(data.symbols ? clean(data.symbols) : undefined)));
+
+/** Finished sessions only: today's bar is left out until today's regular session is over. */
+const finished = (bars: DailyBar[], session: Session, now: Date) => {
+  const today = etDate(now);
+  const live = session === "pre" || session === "regular";
+  return bars.filter((b) => b.date < today || (b.date === today && !live));
+};
+
+/**
+ * Edge Finder: today's unusual gaps and volume across the tracked stocks, each with the signal's real
+ * two-year record, so a pick can be judged like a bet with a known history.
+ */
+export const getEdges = createServerFn({ method: "GET" }).handler(() =>
+  live<Board>(async (session, now) => {
+    const symbols = STOCKS.map((s) => s.ticker);
+    const [daily, trades] = await Promise.all([dailyBars(symbols, HISTORY_DAYS), latestTrades(symbols)]);
+    const today = etDate(now);
+    const done = Object.fromEntries(symbols.map((s) => [s, finished(daily[s] ?? [], session, now)]));
+    const facts = Object.fromEntries(symbols.map((s) => [s, dayFacts(done[s]!)]));
+    const book = signalBook(Object.values(facts));
+    const refDate = Object.values(done).reduce((d, bars) => (bars.at(-1)?.date ?? "") > d ? bars.at(-1)!.date : d, "");
+    const when: Board["when"] = session === "pre" ? "pre" : session === "regular" ? "today" : "last";
+    const rows = symbols.flatMap((s) => {
+      const bars = daily[s] ?? [];
+      const quote = summarize(s, bars, trades[s] ?? null, session, now);
+      if (!quote) return [];
+      const todayBar = session === "regular" ? (bars.find((b) => b.date === today) ?? null) : null;
+      const row = boardRow(quote, done[s]!, todayBar, session, now);
+      if (!row) return [];
+      const strength = strengthOf(row);
+      const own = signalBook([facts[s]!]);
+      return [
+        {
+          ...row,
+          strength,
+          flagged: strength >= 1,
+          lean: leanOf(row, book),
+          reasons: explain({ ...row, strength }, book, own, { when, refDate, stocks: symbols.length }),
+        },
+      ];
+    });
+    rows.sort((a, b) => b.strength - a.strength);
+    return { when, date: when === "last" || when === "pre" ? refDate : today, rows, book, stocks: symbols.length };
+  }),
+);
+
+const pickInput = z.object({
+  id: z.string().max(64),
+  ticker: z.string().transform((s) => s.trim().toUpperCase()),
+  side: z.enum(["up", "down"]),
+  entry: z.number().positive(),
+  at: z.string().datetime(),
+  signal: z.string().max(80),
+});
+
+/** Grades paper picks against real closing prices: did the entry beat the close, and how did it end up? */
+export const getPickResults = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ picks: z.array(pickInput).max(300) }).parse(data))
+  .handler(({ data }) =>
+    live<PickResult[]>(async (session, now) => {
+      const picks = data.picks.filter((p) => isTicker(p.ticker));
+      if (!picks.length) return [];
+      const oldest = Math.min(...picks.map((p) => Date.parse(p.at)));
+      const days = Math.min(HISTORY_DAYS, Math.ceil((now.getTime() - oldest) / 86_400_000) + 15);
+      // From a little before the oldest pick, so its grading session and the 5 after it are included.
+      const daily = await dailyBars(clean(picks.map((p) => p.ticker)), Math.max(days, 30));
+      return picks.map((p) => gradePick(p, finished(daily[p.ticker] ?? [], session, now)));
+    }),
+  );

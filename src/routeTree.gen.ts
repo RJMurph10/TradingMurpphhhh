@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BacktestingRouteImport } from './routes/backtesting'
+import { Route as EdgesRouteImport } from './routes/edges'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PredictionsRouteImport } from './routes/predictions'
 import { Route as ResearchRouteImport } from './routes/research'
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const BacktestingRoute = BacktestingRouteImport.update({
   id: '/backtesting',
   path: '/backtesting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EdgesRoute = EdgesRouteImport.update({
+  id: '/edges',
+  path: '/edges',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -62,6 +68,7 @@ const WatchlistRoute = WatchlistRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/backtesting': typeof BacktestingRoute
+  '/edges': typeof EdgesRoute
   '/portfolio': typeof PortfolioRoute
   '/predictions': typeof PredictionsRoute
   '/research': typeof ResearchRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/backtesting': typeof BacktestingRoute
+  '/edges': typeof EdgesRoute
   '/portfolio': typeof PortfolioRoute
   '/predictions': typeof PredictionsRoute
   '/research': typeof ResearchRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/backtesting': typeof BacktestingRoute
+  '/edges': typeof EdgesRoute
   '/portfolio': typeof PortfolioRoute
   '/predictions': typeof PredictionsRoute
   '/research': typeof ResearchRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/backtesting'
+    | '/edges'
     | '/portfolio'
     | '/predictions'
     | '/research'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/backtesting'
+    | '/edges'
     | '/portfolio'
     | '/predictions'
     | '/research'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/backtesting'
+    | '/edges'
     | '/portfolio'
     | '/predictions'
     | '/research'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BacktestingRoute: typeof BacktestingRoute
+  EdgesRoute: typeof EdgesRoute
   PortfolioRoute: typeof PortfolioRoute
   PredictionsRoute: typeof PredictionsRoute
   ResearchRoute: typeof ResearchRoute
@@ -148,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/backtesting'
       fullPath: '/backtesting'
       preLoaderRoute: typeof BacktestingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/edges': {
+      id: '/edges'
+      path: '/edges'
+      fullPath: '/edges'
+      preLoaderRoute: typeof EdgesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -198,6 +218,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BacktestingRoute: BacktestingRoute,
+  EdgesRoute: EdgesRoute,
   PortfolioRoute: PortfolioRoute,
   PredictionsRoute: PredictionsRoute,
   ResearchRoute: ResearchRoute,
