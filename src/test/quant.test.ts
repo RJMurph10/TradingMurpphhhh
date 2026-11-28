@@ -67,6 +67,15 @@ describe("quantitative research rules", () => {
     expect(scored.spark).toHaveLength(30);
   });
 
+  it("ignores today's unfinished volume and half-day sessions when judging unusual volume", () => {
+    const steady = path(60).map((p) => ({ ...p, volume: 1_000_000 }));
+    const quote = { ticker: "X", name: "X", sector: "Technology", price: 100, change: 0, prevClose: 100, volume: 0, dayHigh: null, dayLow: null, ext: null, lastTradeAt: null };
+    const withPartial = [...steady, { date: "2026-11-30", price: 120, benchmark: 0, volume: 100_000, partial: true }];
+    expect(scoreStock(quote, withPartial, steady).volumeAnomaly).toBeCloseTo(0, 6);
+    const withHalfDay = [...steady, { date: "2026-11-27", price: 120, benchmark: 0, volume: 300_000 }];
+    expect(scoreStock(quote, withHalfDay, steady).volumeAnomaly).toBeCloseTo(0, 6);
+  });
+
   it("values a portfolio from live prices and cost basis", () => {
     const aapl = summarize(
       "AAPL",

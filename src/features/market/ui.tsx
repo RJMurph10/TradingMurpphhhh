@@ -201,7 +201,7 @@ export function StockTable({ rows, action }: { rows: Scored[]; action?: (s: Scor
             <th className="text-right">PRICE</th>
             <th className="text-right">CHANGE</th>
             <th className="text-right">VOLUME</th>
-            <th>SIGNAL</th>
+            <th title="Based on the last 20 trading days, not just today's move">20-DAY SIGNAL</th>
             {action && <th />}
           </tr>
         </thead>

@@ -55,6 +55,8 @@ export const isTradingDay = (date: string) => {
 };
 
 /** Minutes after midnight ET when the regular session closes on a trading day. */
+export const isEarlyClose = (date: string) => EARLY_CLOSE.has(date);
+
 export const closeMinutes = (date: string) => (EARLY_CLOSE.has(date) ? 13 * 60 : 16 * 60);
 
 export function marketSession(now: Date = new Date()): Session {

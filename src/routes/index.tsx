@@ -15,6 +15,9 @@ export const Route = createFileRoute("/")({
   component: Dashboard,
 });
 
+/** Headlines about the companies and index funds we track (not every global wire story). */
+const NEWS_SYMBOLS = [...INDEX_FUNDS.slice(0, 4).map((f) => f.ticker), ...STOCKS.map((s) => s.ticker)];
+
 /** Sessions shown for each daily chart range. */
 const SESSIONS: Record<string, number> = { "1M": 21, "3M": 63, "6M": 126, "1Y": 252 };
 
@@ -225,7 +228,7 @@ function IndexChart({ symbol, period }: { symbol: string; period: string }) {
 }
 
 function NewsPanel() {
-  const news = useNews();
+  const news = useNews(NEWS_SYMBOLS);
   const items = dataOf(news.data) ?? [];
   return (
     <Panel title="Market news" action={<Globe2 />} className="mt-5 lg:mt-5">
@@ -272,7 +275,7 @@ function Radar({ quotes }: { quotes: Map<string, Scored> }) {
                   <Change value={s.change} />
                 </span>
                 <div className="text-[11px] text-muted-foreground mt-2">
-                  Quantitative score{" "}
+                  20-day trend score{" "}
                   <span className="text-primary font-mono ml-2">
                     {s.score}/100 · {signal(s.score)}
                   </span>
