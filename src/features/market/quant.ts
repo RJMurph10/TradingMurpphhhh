@@ -1,5 +1,6 @@
 // Research math on real daily closes: indicators, simple models, the signal score and backtests.
 import type { PricePoint, Quote } from "./quotes";
+import { isEarlyClose } from "./session";
 
 export const mean = (a: number[]) => (a.length ? a.reduce((s, n) => s + n, 0) / a.length : 0);
 
@@ -96,9 +97,11 @@ export function scoreStock(quote: Quote, h: PricePoint[], benchmark: PricePoint[
   const x = indicators(h);
   const momentum = momentumOf(h);
   const relativeStrength = momentum - momentumOf(benchmark);
-  // Compare the last finished session's volume with the 20 sessions before it.
-  const lastVolume = h.at(-1)?.volume ?? 0;
-  const averageVolume = mean(h.slice(-21, -1).map((p) => p.volume));
+  // Compare the last full trading day's volume with the 20 full days before it. Today's unfinished
+  // day and half-day sessions (like the day after Thanksgiving) would always look unusually quiet.
+  const full = h.filter((p) => !p.partial && !isEarlyClose(p.date));
+  const lastVolume = full.at(-1)?.volume ?? 0;
+  const averageVolume = mean(full.slice(-21, -1).map((p) => p.volume));
   const volumeAnomaly = averageVolume ? (lastVolume / averageVolume - 1) * 100 : 0;
   const trendPoints = (x.last > x.ma20 ? 5 : -5) + (x.last > x.ma50 ? 5 : -5);
   const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));

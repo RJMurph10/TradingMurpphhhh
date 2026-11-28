@@ -9,7 +9,14 @@ export type DailyBar = { date: string; o: number; h: number; l: number; c: numbe
 export type Trade = { p: number; t: string };
 
 /** A point on a chart. `benchmark` is an optional second line (comparison or buy-and-hold). */
-export type PricePoint = { date: string; price: number; benchmark: number; volume: number };
+export type PricePoint = {
+  date: string;
+  price: number;
+  benchmark: number;
+  volume: number;
+  /** True for today's point while the market is still open (its volume is only part of a day). */
+  partial?: boolean;
+};
 
 export type Quote = {
   ticker: string;
@@ -90,7 +97,7 @@ export function closesToPoints(bars: DailyBar[], quote: Quote | null, session: S
     .filter((b) => b.date !== today || (session !== "pre" && session !== "regular"))
     .map((b) => ({ date: b.date, price: b.c, benchmark: 0, volume: b.v }));
   if (session === "regular" && quote) {
-    points.push({ date: today, price: quote.price, benchmark: 0, volume: quote.volume });
+    points.push({ date: today, price: quote.price, benchmark: 0, volume: quote.volume, partial: true });
   }
   return points;
 }
