@@ -2,7 +2,7 @@ import {createContext,useContext,useEffect,useState,type ReactNode} from 'react'
 import {useServerFn} from '@tanstack/react-start';
 import {supabase} from '@/integrations/supabase/client';
 import {readCollections,saveHolding,saveWatchlist} from './collections.functions';
-import {getStock} from '@/features/market/sample-data';
+import {isTicker} from '@/features/market/universe';
 export type Holding={ticker:string;shares:number;cost_basis:number};
 const initialHoldings:Holding[]=[{ticker:'AAPL',shares:40,cost_basis:220},{ticker:'NVDA',shares:65,cost_basis:125},{ticker:'MSFT',shares:20,cost_basis:400},{ticker:'SPY',shares:30,cost_basis:565}];
 const Context=createContext<{email:string|null;authOpen:boolean;openAuth:()=>void;closeAuth:()=>void;watchlist:string[];holdings:Holding[];toggleWatch:(t:string)=>Promise<void>;addHolding:(h:Holding)=>Promise<void>;removeHolding:(t:string)=>Promise<void>;error:string;loading:boolean}|null>(null);
@@ -15,7 +15,7 @@ export function ResearchProvider({children}:{children:ReactNode}) {
   const {data}=supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='SIGNED_OUT'||event==='USER_UPDATED')setTimeout(()=>void sync(session?.user.email??null,session?.user.id??null),0);});
   return()=>{active=false;data.subscription.unsubscribe();};
  },[read]);
- const toggleWatch=async(ticker:string)=>{if(!getStock(ticker)){setError('Ticker is not available in the sample universe.');return;}setError('');const remove=watchlist.includes(ticker);try{if(email)await saveW({data:{ticker,remove}});setWatchlist(w=>remove?w.filter(t=>t!==ticker):[...w,ticker]);}catch{setError('Watchlist could not be saved.');}};
+ const toggleWatch=async(ticker:string)=>{if(!isTicker(ticker)){setError('Enter a valid US stock or ETF ticker symbol.');return;}setError('');const remove=watchlist.includes(ticker);try{if(email)await saveW({data:{ticker,remove}});setWatchlist(w=>remove?w.filter(t=>t!==ticker):[...w,ticker]);}catch{setError('Watchlist could not be saved.');}};
  const addHolding=async(h:Holding)=>{setError('');try{if(email)await saveP({data:{...h,remove:false}});setHoldings(p=>[...p.filter(x=>x.ticker!==h.ticker),h]);}catch{setError('Holding could not be saved.');}};
  const removeHolding=async(ticker:string)=>{const h=holdings.find(x=>x.ticker===ticker);if(!h)return;try{if(email)await saveP({data:{...h,remove:true}});setHoldings(p=>p.filter(x=>x.ticker!==ticker));}catch{setError('Holding could not be removed.');}};
  return <Context.Provider value={{email,authOpen,openAuth:()=>setAuthOpen(true),closeAuth:()=>setAuthOpen(false),watchlist,holdings,toggleWatch,addHolding,removeHolding,error,loading}}>{children}</Context.Provider>;
