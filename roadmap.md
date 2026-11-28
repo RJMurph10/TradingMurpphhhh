@@ -7,4 +7,6 @@
 - [x] Watchlist and hypothetical portfolio management with Cloud saving.
 - [x] Authentication and integrity tests (build, type check and 7 tests pass).
 - [x] Branding renamed from QuantEdge to TradingMurpphhhh.
-- [ ] Polygon.io market data connection — provider selected; connection approval was declined, so live data remains blocked. Everything on screen is sample data until this is connected.
+- [x] Live market data from Alpaca (free plan): real-time prices in pre-market, regular and after-hours sessions, two years of daily history, intraday charts and news. Sample data removed.
+- [ ] Validate the prediction models against past data (out-of-sample testing).
+- [ ] Paper trading: place pretend orders through the Alpaca paper account.
