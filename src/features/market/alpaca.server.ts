@@ -5,7 +5,7 @@
 // - Live prices come from the IEX exchange in real time, including pre-market and after-hours trades.
 // - Full-market (SIP) data, used for daily history and volume, is available up to 15 minutes ago.
 
-import { serverEnv } from "@/lib/server-env";
+import { serverEnv, serverEnvNames } from "@/lib/server-env";
 import { etDate } from "./session";
 import type { DailyBar, PricePoint, Trade } from "./quotes";
 
@@ -23,14 +23,34 @@ export class AlpacaError extends Error {
   }
 }
 
+/** Names people commonly give these secrets; the first one that is set wins. */
+const KEY_ID_NAMES = ["ALPACA_API_KEY_ID", "ALPACA_KEY_ID", "APCA_API_KEY_ID", "ALPACA_API_KEY", "ALPACA_KEY"];
+const SECRET_NAMES = ["ALPACA_API_SECRET_KEY", "ALPACA_SECRET_KEY", "APCA_API_SECRET_KEY", "ALPACA_API_SECRET", "ALPACA_SECRET"];
+
+const firstSet = (names: string[]) => {
+  for (const n of names) {
+    const v = serverEnv(n)?.trim();
+    if (v) return v;
+  }
+  return undefined;
+};
+
 function keys() {
-  const id = serverEnv("ALPACA_API_KEY_ID");
-  const secret = serverEnv("ALPACA_API_SECRET_KEY");
-  if (!id || !secret)
+  const id = firstSet(KEY_ID_NAMES);
+  const secret = firstSet(SECRET_NAMES);
+  if (!id || !secret) {
+    // Names only, never values: which Alpaca-looking settings the server can see, to spot a typo.
+    const all = serverEnvNames();
+    const seen = [...new Set(Object.values(all).flat())].filter((n) => /ALPACA|APCA/i.test(n));
+    const missing = [!id && "ALPACA_API_KEY_ID", !secret && "ALPACA_API_SECRET_KEY"].filter(Boolean).join(" and ");
     throw new AlpacaError(
       "missing-keys",
-      "Live data isn't connected yet. Add ALPACA_API_KEY_ID and ALPACA_API_SECRET_KEY in Lovable Cloud → Secrets.",
+      `Live data isn't connected yet: the server can't see ${missing}. ` +
+        (seen.length
+          ? `Alpaca settings it can see: ${seen.join(", ")}. Rename them to match exactly, then publish again.`
+          : "It can't see any Alpaca settings at all. Add both in Lovable Cloud → Secrets, then click Publish → Update so the live site picks them up."),
     );
+  }
   return { "APCA-API-KEY-ID": id, "APCA-API-SECRET-KEY": secret };
 }
 

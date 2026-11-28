@@ -22,6 +22,20 @@ describe("Alpaca market data client", () => {
     await expect(latestTrades(["AAPL"])).rejects.toMatchObject({ reason: "missing-keys" });
   });
 
+  it("names the Alpaca settings it can see when one is misnamed, and accepts common alternatives", async () => {
+    delete process.env["ALPACA_API_SECRET_KEY"];
+    process.env["ALPACA_SECRET"] = "s";
+    vi.stubGlobal("fetch", vi.fn(async () => json({ trades: {} })));
+    const { latestTrades } = await import("@/features/market/alpaca.server");
+    await expect(latestTrades(["AAPL"])).resolves.toEqual({});
+    delete process.env["ALPACA_SECRET"];
+    process.env["ALPACA_SECRET_KY"] = "typo";
+    vi.resetModules();
+    const again = await import("@/features/market/alpaca.server");
+    await expect(again.latestTrades(["MSFT"])).rejects.toThrow(/ALPACA_SECRET_KY/);
+    delete process.env["ALPACA_SECRET_KY"];
+  });
+
   it("sends the keys as headers and reads the latest trades from IEX", async () => {
     const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) =>
       json({ trades: { AAPL: { t: "2026-11-30T21:30:00Z", x: "V", p: 238.12, s: 10, c: ["@"], i: 1, z: "C" } } }),
