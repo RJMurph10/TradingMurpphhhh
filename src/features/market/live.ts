@@ -1,7 +1,8 @@
 // React hooks that keep live data fresh, like the gambling site's live scores: each one re-asks the server on a timer.
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getHistory, getIntraday, getNews, getQuotes, type Live } from "./market.functions";
+import { getEdges, getHistory, getIntraday, getNews, getPickResults, getQuotes, type Live } from "./market.functions";
+import type { PaperPick } from "./edges";
 import { MARKET_SYMBOLS } from "./universe";
 
 /** How often prices refresh in the browser. */
@@ -53,6 +54,30 @@ export function useNews(symbols?: string[]) {
     queryKey: ["news", symbols?.join(",") ?? ""],
     queryFn: () => fn({ data: { symbols } }),
     refetchInterval: 120_000,
+  });
+}
+
+/** The Edge Finder board. Gaps and volume move slowly compared with prices, so once a minute is enough. */
+export function useEdges() {
+  const fn = useServerFn(getEdges);
+  return useQuery({
+    queryKey: ["edges"],
+    queryFn: () => fn(),
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+    placeholderData: (prev) => prev,
+  });
+}
+
+/** Grades paper picks against real closes. */
+export function usePickResults(picks: PaperPick[]) {
+  const fn = useServerFn(getPickResults);
+  return useQuery({
+    queryKey: ["pick-results", picks.map((p) => p.id).join(",")],
+    queryFn: () => fn({ data: { picks } }),
+    enabled: picks.length > 0,
+    refetchInterval: 5 * 60_000,
+    placeholderData: (prev) => prev,
   });
 }
 
